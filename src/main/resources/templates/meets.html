@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetMaster</title>
+    <style th:replace="~{style.css}"></style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img th:if="${not #strings.isEmpty(iconUrl)}" th:src="${iconUrl}" alt="">
+        <span th:if="${#strings.isEmpty(iconUrl)}">&#128197;</span>
+    </div>
+    <h1>MeetMaster</h1>
+    <button class="btn-create" onclick="document.getElementById('create-dialog').showModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New meeting
+    </button>
+</header>
+
+<dialog id="create-dialog">
+    <div class="dialog-inner">
+        <h2>New meeting</h2>
+        <form method="post" th:action="@{/meets}">
+            <input type="hidden" name="period" th:value="${period}">
+            <div class="field">
+                <label for="meet-name">Meeting name</label>
+                <input id="meet-name" name="name" type="text" required autofocus
+                       placeholder="e.g. Weekly sync" maxlength="120">
+            </div>
+            <div class="dialog-actions">
+                <button type="button" class="btn-cancel" onclick="document.getElementById('create-dialog').close()">Cancel</button>
+                <button type="submit" class="btn-submit">Create</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<main>
+    <div class="toolbar">
+        <nav class="period-tabs">
+            <a th:href="@{/meets(period='7')}"   th:class="${period == '7'}   ? 'active'">Past 7 days</a>
+            <a th:href="@{/meets(period='30')}"  th:class="${period == '30'}  ? 'active'">Past 30 days</a>
+            <a th:href="@{/meets(period='all')}" th:class="${period == 'all'} ? 'active'">All time</a>
+        </nav>
+        <span class="summary"
+              th:text="${meets.size()} + (${meets.size() == 1} ? ' meeting' : ' meetings')"></span>
+    </div>
+
+    <div class="meet-list" th:if="${not #lists.isEmpty(meets)}">
+        <div class="meet-card" th:each="meet : ${meets}">
+
+            <!-- Left -->
+            <div>
+                <a class="meet-name" th:href="@{/m/{id}(id=${meet.id})}" th:text="${meet.name}"></a>
+
+                <div class="participants-row" th:if="${not #sets.isEmpty(meet.participants)}">
+                    <span class="chip" th:each="p : ${meet.participants}" th:text="${p}"></span>
+                </div>
+                <div class="no-participants" th:if="${#sets.isEmpty(meet.participants)}">No participants yet</div>
+
+                <div class="meet-footer">
+                    <span class="icon-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span th:text="${meet.creator}"></span>
+                    </span>
+                    <span class="icon-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <time th:attr="data-ts=${meet.createTime}"></time>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right -->
+            <div class="right-col">
+                <span class="meet-id" th:text="'#' + ${meet.id}"></span>
+                <span th:if="${meet.active}"   class="badge badge-active">Active</span>
+                <span th:unless="${meet.active}" class="badge badge-inactive">Inactive</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="empty-state" th:if="${#lists.isEmpty(meets)}">
+        <div class="empty-icon">&#128236;</div>
+        <h3>No meetings found</h3>
+        <p>There are no meetings in the selected time period.</p>
+    </div>
+</main>
+
+<script>
+    document.querySelectorAll('time[data-ts]').forEach(el => {
+        el.textContent = new Date(parseInt(el.dataset.ts) * 1000).toLocaleString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+    });
+</script>
+
+</body>
+</html>

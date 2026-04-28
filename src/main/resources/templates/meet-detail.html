@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${meet.name} + ' — MeetMaster'">Meeting — MeetMaster</title>
+    <style th:replace="~{style.css}"></style>
+    <style>
+        .detail-wrap {
+            max-width: 520px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .detail-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -.03em;
+            line-height: 1.2;
+            margin-bottom: .6rem;
+        }
+
+        .detail-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            font-size: .875rem;
+            color: var(--muted);
+            margin-bottom: 2.25rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-meta .sep { color: var(--border); }
+
+        .qr-wrap {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.75rem 1.75rem 1.25rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.75rem;
+        }
+
+        .qr-wrap img {
+            display: block;
+            width: 280px;
+            height: 280px;
+            border-radius: 6px;
+        }
+
+        .qr-hint {
+            margin-top: .875rem;
+            font-size: .8125rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .btn-participate {
+            padding: .75rem 2.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background .15s;
+            border: none;
+            background: var(--brand);
+            color: #fff;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-participate:hover:not(:disabled) { background: var(--brand-dark); }
+
+        .btn-participate:disabled {
+            background: var(--muted-bg);
+            color: var(--muted);
+            border: 1.5px solid var(--border);
+            cursor: default;
+        }
+
+        .participants-section {
+            width: 100%;
+            text-align: left;
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+        }
+
+        .participants-section h3 {
+            font-size: .8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted);
+            margin-bottom: .875rem;
+        }
+
+        .back-link {
+            color: rgba(255,255,255,.8);
+            text-decoration: none;
+            font-size: .875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            transition: color .15s;
+            white-space: nowrap;
+        }
+
+        .back-link:hover { color: #fff; }
+
+        .meeting-ended {
+            background: var(--muted-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--muted);
+            width: 100%;
+        }
+
+        .meeting-ended-icon { font-size: 2.25rem; margin-bottom: .5rem; }
+
+        .meeting-ended p { font-size: .9375rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img th:if="${not #strings.isEmpty(iconUrl)}" th:src="${iconUrl}" alt="">
+        <span th:if="${#strings.isEmpty(iconUrl)}">&#128197;</span>
+    </div>
+    <h1>MeetMaster</h1>
+    <a class="back-link" th:href="@{/meets}">&#8592; Meetings</a>
+</header>
+
+<div class="detail-wrap">
+
+    <h2 class="detail-title" th:text="${meet.name}"></h2>
+
+    <div class="detail-meta">
+        <span class="icon-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span th:text="${meet.creator}"></span>
+        </span>
+        <span class="sep">·</span>
+        <span class="icon-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <time th:attr="data-ts=${meet.createTime}"></time>
+        </span>
+        <span class="sep">·</span>
+        <span th:if="${meet.active}"   class="badge badge-active">Active</span>
+        <span th:unless="${meet.active}" class="badge badge-inactive">Inactive</span>
+    </div>
+
+    <div th:if="${meet.active}" class="qr-wrap">
+        <img th:src="@{/qr(url=${currentUrl})}" alt="QR code for this meeting">
+        <p class="qr-hint">Scan to open this meeting</p>
+    </div>
+
+    <div th:unless="${meet.active}" class="meeting-ended">
+        <div class="meeting-ended-icon">&#128683;</div>
+        <p>This meeting has ended.</p>
+    </div>
+
+    <div th:if="${meet.active and isParticipant}" style="margin-bottom:2.5rem">
+        <button class="btn-participate" disabled>&#10003; Already participating</button>
+    </div>
+    <form th:if="${meet.active and !isParticipant}" method="post" th:action="@{/m/{id}/participate(id=${meet.id})}">
+        <button type="submit" class="btn-participate">Join this meeting</button>
+    </form>
+
+    <div class="participants-section" th:if="${not #sets.isEmpty(meet.participants)}">
+        <h3>Participants (<span th:text="${meet.participants.size()}"></span>)</h3>
+        <div class="participants-row">
+            <span class="chip" th:each="p : ${meet.participants}" th:text="${p}"></span>
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    document.querySelectorAll('time[data-ts]').forEach(el => {
+        el.textContent = new Date(parseInt(el.dataset.ts) * 1000).toLocaleString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+    });
+
+    const meetId      = /*[[${meet.id}]]*/ '';
+    const knownHash   = /*[[${participantsHash}]]*/ '';
+
+    setInterval(async () => {
+        try {
+            const res = await fetch(`/api/m/${meetId}/participants-hash`);
+            if (!res.ok) return;
+            const { hash } = await res.json();
+            if (hash !== knownHash) location.reload();
+        } catch (_) { /* ignore transient network errors */ }
+    }, 1000);
+</script>
+
+</body>
+</html>

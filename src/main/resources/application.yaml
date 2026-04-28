@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: MeetMaster
+  datasource:
+    url: jdbc:postgresql://${PG_HOST:localhost}:${PG_PORT:5432}/${PG_DATABASE:meetmaster}
+    username: ${PG_USER:meetmaster}
+    password: ${PG_PASS:meetmaster}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  session:
+    jdbc:
+      initialize-schema: always
+  security:
+    oauth2:
+      client:
+        registration:
+          oidc:
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-id: ${OIDC_CLIENT_ID}
+            client-secret: ${OIDC_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+        provider:
+          oidc:
+            authorization-uri: ${OIDC_AUTH_URL}
+            token-uri: ${OIDC_TOKEN_URL}
+            user-info-uri: ${OIDC_USER_INFO_URL}
+            user-name-attribute: ${NAME_CLAIM:name}
+            jwk-set-uri: ${OIDC_JWKS_URL}
+
+app:
+  icon-url: ${ICON_URL:}
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework.web.client: INFO
+
