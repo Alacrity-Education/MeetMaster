@@ -1,3 +1,4 @@
+# ── Build ──────────────────────────────────────────────────
 FROM eclipse-temurin:26-jdk AS build
 WORKDIR /build
 
@@ -9,6 +10,7 @@ RUN mvn dependency:go-offline -q
 COPY src/ src/
 RUN mvn package -DskipTests -q
 
+# ── Runtime ────────────────────────────────────────────────
 FROM eclipse-temurin:26-jdk
 WORKDIR /app
 
