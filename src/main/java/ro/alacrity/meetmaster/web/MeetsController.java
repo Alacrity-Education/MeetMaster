@@ -31,7 +31,7 @@ public class MeetsController {
         this.meetRepository = meetRepository;
     }
 
-    @GetMapping("/meets")
+    @GetMapping({"/", "/meets"})
     public String listMeets(@RequestParam(defaultValue = "7") String period, Model model) {
         long now = Instant.now().getEpochSecond();
 
