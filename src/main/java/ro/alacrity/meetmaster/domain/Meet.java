@@ -31,7 +31,7 @@ public class Meet {
 
     @PrePersist
     private void prePersist() {
-        createTime = Instant.now().getEpochSecond(); // TODO: check if this is correct, as persist might fuck with edits.
+        createTime = Instant.now().getEpochSecond();
     }
 
     public Meet() {}
