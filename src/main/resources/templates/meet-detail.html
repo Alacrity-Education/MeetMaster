@@ -226,7 +226,7 @@
         <div class="participants-row" th:if="${not #sets.isEmpty(meet.participants)}">
             <span class="chip" th:each="p : ${meet.participants}" th:text="${p}"></span>
         </div>
-        <form th:if="${isCreator}" class="add-participant-form" method="post"
+        <form th:if="${isCreator and meet.active}" class="add-participant-form" method="post"
               th:action="@{/m/{id}/participants(id=${meet.id})}">
             <input type="text" name="name" placeholder="Add participant…" required maxlength="120" autocomplete="off">
             <button type="submit">Add</button>

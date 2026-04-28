@@ -53,11 +53,15 @@ public class MeetsController {
     public String createMeet(@RequestParam String name,
                              @RequestParam(defaultValue = "7") String period,
                              @AuthenticationPrincipal OAuth2User user) {
+        String trimmedName = name.strip();
+        if (trimmedName.isEmpty() || trimmedName.length() > 200) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Meeting name must be 1-200 characters");
+        }
         String creator = user.getName();
         String id = meetRepository.generateUniqueId();
         var participants = new HashSet<String>();
         participants.add(creator);
-        meetRepository.save(new Meet(id, name, participants, creator, true));
+        meetRepository.save(new Meet(id, trimmedName, participants, creator, true));
         return "redirect:/meets?period=" + period;
     }
 
@@ -101,9 +105,10 @@ public class MeetsController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         String trimmed = name.strip();
-        if (!trimmed.isEmpty()) {
-            meet.getParticipants().add(trimmed);
+        if (trimmed.isEmpty() || trimmed.length() > 120) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Participant name must be 1-120 characters");
         }
+        meet.getParticipants().add(trimmed);
         return "redirect:/m/" + id;
     }
 

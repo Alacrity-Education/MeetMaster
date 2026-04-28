@@ -31,6 +31,7 @@ spring:
             jwk-set-uri: ${OIDC_JWKS_URL}
 
 app:
+  trust-proxy-headers: ${TRUST_PROXY_HEADERS:false}
   icon-url: ${ICON_URL:}
   favicon-url: ${FAVICON_URL:}
 
