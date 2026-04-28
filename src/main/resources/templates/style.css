@@ -231,6 +231,9 @@
         padding: 0;
         width: min(440px, 90vw);
         box-shadow: 0 20px 60px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.1);
+        position: fixed;
+        inset: 0;
+        margin: auto;
     }
 
     dialog[open] { animation: dialog-pop .2s ease; }
