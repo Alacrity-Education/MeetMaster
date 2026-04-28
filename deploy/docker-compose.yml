@@ -1,0 +1,41 @@
+services:
+  app:
+    image: ${IMAGE}:${TAG}
+    ports:
+      - "8080:8080"
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASS: ${PG_PASS}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_AUTH_URL: ${OIDC_AUTH_URL}
+      OIDC_TOKEN_URL: ${OIDC_TOKEN_URL}
+      OIDC_USER_INFO_URL: ${OIDC_USER_INFO_URL}
+      OIDC_JWKS_URL: ${OIDC_JWKS_URL}
+      NAME_CLAIM: ${NAME_CLAIM}
+      ICON_URL: ${ICON_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_DB: ${PG_DATABASE}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:
