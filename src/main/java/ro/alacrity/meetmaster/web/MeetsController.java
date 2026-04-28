@@ -71,6 +71,7 @@ public class MeetsController {
         model.addAttribute("meet", meet);
         model.addAttribute("currentUrl", request.getRequestURL().toString());
         model.addAttribute("isParticipant", meet.getParticipants().contains(user.getName()));
+        model.addAttribute("isCreator", meet.getCreator().equals(user.getName()));
         model.addAttribute("participantsHash", participantsHash(meet.getParticipants()));
         return "meet-detail";
     }
@@ -87,6 +88,23 @@ public class MeetsController {
         return Integer.toHexString(
                 participants.stream().sorted().collect(Collectors.joining(",")).hashCode()
         );
+    }
+
+    @Transactional
+    @PostMapping("/m/{id}/participants")
+    public String addParticipant(@PathVariable String id,
+                                 @RequestParam String name,
+                                 @AuthenticationPrincipal OAuth2User user) {
+        Meet meet = meetRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (!meet.getCreator().equals(user.getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        String trimmed = name.strip();
+        if (!trimmed.isEmpty()) {
+            meet.getParticipants().add(trimmed);
+        }
+        return "redirect:/m/" + id;
     }
 
     @Transactional

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${meet.name} + ' — MeetMaster'">Meeting — MeetMaster</title>
+    <link th:if="${not #strings.isEmpty(faviconUrl)}" rel="icon" th:href="${faviconUrl}">
     <style th:replace="~{style.css}"></style>
     <style>
         .detail-wrap {
@@ -127,6 +128,46 @@
         .meeting-ended-icon { font-size: 2.25rem; margin-bottom: .5rem; }
 
         .meeting-ended p { font-size: .9375rem; }
+
+        .add-participant-form {
+            display: flex;
+            gap: .5rem;
+            margin-top: .875rem;
+        }
+
+        .add-participant-form input {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: .4rem .75rem;
+            font-size: .875rem;
+            font-family: inherit;
+            color: var(--text);
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+            min-width: 0;
+        }
+
+        .add-participant-form input:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+        }
+
+        .add-participant-form button {
+            background: var(--brand);
+            border: none;
+            border-radius: 8px;
+            padding: .4rem 1rem;
+            font-size: .875rem;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+
+        .add-participant-form button:hover { background: var(--brand-dark); }
     </style>
 </head>
 <body>
@@ -180,11 +221,16 @@
         <button type="submit" class="btn-participate">Join this meeting</button>
     </form>
 
-    <div class="participants-section" th:if="${not #sets.isEmpty(meet.participants)}">
+    <div class="participants-section" th:if="${not #sets.isEmpty(meet.participants) or isCreator}">
         <h3>Participants (<span th:text="${meet.participants.size()}"></span>)</h3>
-        <div class="participants-row">
+        <div class="participants-row" th:if="${not #sets.isEmpty(meet.participants)}">
             <span class="chip" th:each="p : ${meet.participants}" th:text="${p}"></span>
         </div>
+        <form th:if="${isCreator}" class="add-participant-form" method="post"
+              th:action="@{/m/{id}/participants(id=${meet.id})}">
+            <input type="text" name="name" placeholder="Add participant…" required maxlength="120" autocomplete="off">
+            <button type="submit">Add</button>
+        </form>
     </div>
 
 </div>
