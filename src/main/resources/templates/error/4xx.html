@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${status} + ' - MeetMaster'">Error - MeetMaster</title>
+    <link th:if="${not #strings.isEmpty(faviconUrl)}" rel="icon" th:href="${faviconUrl}">
+    <style th:replace="~{style.css}"></style>
+    <style>
+        .error-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 5rem 1.5rem;
+            min-height: calc(100vh - 68px);
+        }
+
+        .error-code {
+            font-size: 7rem;
+            font-weight: 900;
+            letter-spacing: -.04em;
+            line-height: 1;
+            color: var(--border);
+            margin-bottom: 1.25rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .error-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: .6rem;
+        }
+
+        .error-desc {
+            font-size: .9375rem;
+            color: var(--muted);
+            max-width: 340px;
+            line-height: 1.6;
+            margin-bottom: 2.25rem;
+        }
+
+        .btn-home {
+            background: var(--brand);
+            color: #fff;
+            text-decoration: none;
+            padding: .7rem 1.75rem;
+            border-radius: 10px;
+            font-size: .9375rem;
+            font-weight: 600;
+            transition: background .15s;
+        }
+
+        .btn-home:hover { background: var(--brand-dark); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img th:if="${not #strings.isEmpty(iconUrl)}" th:src="${iconUrl}" alt="">
+        <span th:if="${#strings.isEmpty(iconUrl)}">&#128197;</span>
+    </div>
+    <h1>MeetMaster</h1>
+</header>
+
+<div class="error-wrap">
+    <div class="error-code" th:text="${status}">404</div>
+
+    <h2 class="error-title" th:text="${error}">Not Found</h2>
+
+    <p class="error-desc" th:switch="${status}">
+        <span th:case="400">Something was wrong with the request.</span>
+        <span th:case="403">You don't have permission to access this.</span>
+        <span th:case="404">The page you're looking for doesn't exist or has been moved.</span>
+        <span th:case="*">Check the URL or go back to the home page.</span>
+    </p>
+
+    <a class="btn-home" th:href="@{/}">&#8592; Go home</a>
+</div>
+
+</body>
+</html>
