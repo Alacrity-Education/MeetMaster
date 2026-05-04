@@ -13,6 +13,9 @@ public class GlobalModelAttributes {
     @Value("${app.favicon-url:}")
     private String faviconUrl;
 
+    @Value("${app.title:MeetMaster}")
+    private String appTitle;
+
     @ModelAttribute("iconUrl")
     public String iconUrl() {
         return iconUrl;
@@ -21,5 +24,10 @@ public class GlobalModelAttributes {
     @ModelAttribute("faviconUrl")
     public String faviconUrl() {
         return faviconUrl;
+    }
+
+    @ModelAttribute("appTitle")
+    public String appTitle() {
+        return appTitle;
     }
 }

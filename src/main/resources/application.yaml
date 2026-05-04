@@ -34,6 +34,7 @@ app:
   trust-proxy-headers: ${TRUST_PROXY_HEADERS:false}
   icon-url: ${ICON_URL:}
   favicon-url: ${FAVICON_URL:}
+  title: ${APP_TITLE:MeetMaster}
 
 logging:
   level:

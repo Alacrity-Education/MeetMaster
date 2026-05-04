@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${meet.name} + ' -MeetMaster'">Meeting -MeetMaster</title>
+    <title th:text="${meet.name} + ' - ' + ${appTitle}">Meeting - MeetMaster</title>
     <link th:if="${not #strings.isEmpty(faviconUrl)}" rel="icon" th:href="${faviconUrl}">
     <style th:replace="~{style.css}"></style>
     <style>
@@ -177,7 +177,7 @@
         <img th:if="${not #strings.isEmpty(iconUrl)}" th:src="${iconUrl}" alt="">
         <span th:if="${#strings.isEmpty(iconUrl)}">&#128197;</span>
     </div>
-    <h1>MeetMaster</h1>
+    <h1 th:text="${appTitle}">MeetMaster</h1>
     <a class="back-link" th:href="@{/}">&#8592; Meetings</a>
 </header>
 
